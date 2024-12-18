@@ -20,35 +20,41 @@
     const form = document.getElementById("form");
     const input = document.getElementById("input");
     const messages = document.getElementById("messages");
-function checkuser(){
-    //check if the username exists in localstorage if not then take the username using prompt()
-    if(localStorage.getItem("username")===null){
-        var username = prompt("Enter your username");
-        localStorage.setItem("username",username);
+
+    function checkuser(){
+        // Check if the username exists in localStorage, if not, prompt for it
+        if(localStorage.getItem("username") === null){
+            var username = prompt("Enter your username");
+            localStorage.setItem("username", username);
         }
-        return username
-}
-let name =checkuser()
+        return localStorage.getItem("username");
+    }
+
+    let name = checkuser();
+
     // Send a message
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      name = localStorage.getItem("username")
-      msg = `${name} : ${input.value}`;
+      name = localStorage.getItem("username");
+      const msg = `${name}: ${input.value}`;
       if (input.value) {
         socket.emit("chat message", msg);
         input.value = "";
-        msg = ""
       }
     });
 
     // Receive a message
     socket.on("chat message", (msg) => {
       const item = document.createElement("li");
-      name = localStorage.getItem("username")
-      item.textContent = `${msg}`;
+      item.textContent = msg;
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);
     });
+
+    // Clear localStorage when disconnecting or leaving the page
+    window.onbeforeunload = () => {
+      localStorage.removeItem("username");
+    };
   </script>
 </body>
 </html>
